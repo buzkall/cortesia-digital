@@ -1,5 +1,9 @@
-<div class="flex flex-col min-h-screen">
-    <flux:header container sticky class="bg-orange-500 dark:bg-zinc-900">
+<div class="flex flex-col min-h-screen"
+     x-data
+     @keydown.window.meta.k.prevent="document.getElementById('search-input')?.focus()"
+     @keydown.window.ctrl.k.prevent="document.getElementById('search-input')?.focus()"
+>
+    <flux:header container sticky class="bg-orange-500 dark:bg-zinc-900 py-4">
 
         {{-- Text color forced in app.css --}}
         <flux:brand href="#" name="{{ config('app.name') }}">
@@ -12,8 +16,10 @@
 
         <flux:input kbd="⌘K" icon="magnifying-glass"
                     placeholder="{{ __('Search...') }}"
+                    wire:model.live.debounce="search"
                     class="mx-8"
                     size="sm"
+                    id="search-input"
         />
 
         <div class="flex space-x-4">
@@ -27,14 +33,54 @@
                 <flux:radio value="en" label="En"/>
             </flux:radio.group>
         </div>
-
     </flux:header>
 
-    <flux:main container class="flex-1 bg-orange-500 dark:bg-zinc-900">
+    <div container class="flex-grow bg-orange-500 dark:bg-zinc-900">
+        <flux:main container class="">
+            <div class="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6">
+                @foreach($this->cards as $card)
+                    <flux:card class="break-inside-avoid space-y-6" wire:key="card-{{ $card->id }}">
+                        @if($card->hasMedia())
+                            <flux:modal.trigger name="card-detail-{{ $card->id }}" class="block -mb-4">
+                                <img src="{{ $card->getFirstMediaUrl(conversionName: 'preview') }}"
+                                     alt="{{ $card->title }}"
+                                     class="w-full h-auto object-cover rounded-lg cursor-pointer mb-4">
+                            </flux:modal.trigger>
+                        @endif
 
-        <flux:text class="mt-2 mb-6 text-base">Foreach cards</flux:text>
-        {{ $this->locale }}
-    </flux:main>
+                        <flux:heading size="lg" class="mb-2">{{ $card->title }}</flux:heading>
+                        <flux:text>{{ $card->text }}</flux:text>
 
+                        @if($card->hasMedia())
+                            <flux:modal name="card-detail-{{ $card->id }}" class="w-full max-w-sm md:max-w-xl lg:max-w-4xl">
+                                <div class="space-y-6">
+                                    <flux:heading size="lg">{{ $card->title }}</flux:heading>
 
+                                    <img src="{{ $card->getFirstMediaUrl() }}"
+                                         alt="{{ $card->title }}"
+                                         class="w-full h-auto object-cover rounded-lg">
+
+                                    <flux:text>{{ $card->text }}</flux:text>
+                                </div>
+                            </flux:modal>
+                        @endif
+
+                        @foreach($card->tags as $tag)
+                            <flux:badge size="xs" color="orange">#{{ $tag->name }}</flux:badge>
+                        @endforeach
+                    </flux:card>
+                @endforeach
+            </div>
+        </flux:main>
+    </div>
+
+    <div x-intersect.once="$wire.loadMoreCards()" class="h-1"></div>
+    <div wire:loading wire:target="loadMoreCards">Loading...</div>
+
+    <footer class="sticky bottom-0 bg-accent-foreground px-8 py-4 flex justify-between">
+        <div class="text-xs">{{ config('app.name') }}</div>
+        <div class="text-xs">{{ __('Developed by') }}
+            <a href="https://arzcode.com" target="_blank" class="underline decoration-orange-500">arzcode.com</a>
+        </div>
+    </footer>
 </div>
