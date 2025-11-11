@@ -23,12 +23,14 @@
         />
 
         <div class="flex space-x-4">
-            <flux:radio.group x-data variant="segmented" x-model="$flux.appearance">
+            <flux:radio.group x-data variant="segmented" x-model="$flux.appearance"
+                              class="dark:[&_[data-checked]]:bg-accent">
                 <flux:radio value="light" icon="sun"/>
                 <flux:radio value="dark" icon="moon"/>
             </flux:radio.group>
 
-            <flux:radio.group x-data variant="segmented" wire:model="locale" wire:click="changeLocale">
+            <flux:radio.group x-data variant="segmented" wire:model.live="locale"
+                              class="dark:[&_[data-checked]]:bg-accent">
                 <flux:radio value="es" label="Es"/>
                 <flux:radio value="en" label="En"/>
             </flux:radio.group>
@@ -74,10 +76,18 @@
         </flux:main>
     </div>
 
-    <div x-intersect.once="$wire.loadMoreCards()" class="h-1"></div>
-    <div wire:loading wire:target="loadMoreCards">Loading...</div>
+    @if($this->hasMore)
+        <div class="bg-orange-500 dark:bg-zinc-900 flex justify-center items-center">
+            <div x-intersect="$wire.loadMoreCards()" class="h-1"></div>
 
-    <footer class="sticky bottom-0 bg-accent-foreground px-8 py-4 flex justify-between">
+            <div wire:loading wire:target="loadMoreCards" class="py-4">
+                <flux:icon.loading/>
+            </div>
+        </div>
+    @endif
+
+
+    <footer class="sticky bottom-0 bg-accent/90 text-white dark:text-accent-content px-8 py-4 flex justify-between">
         <div class="text-xs">{{ config('app.name') }}</div>
         <div class="text-xs">{{ __('Developed by') }}
             <a href="https://arzcode.com" target="_blank" class="underline decoration-orange-500">arzcode.com</a>

@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "WebFetch(domain:fluxui.dev)"
+        "WebFetch(domain:fluxui.dev)",
+        "Bash(php artisan tinker:*)"
     ],
     "deny": [],
     "ask": []

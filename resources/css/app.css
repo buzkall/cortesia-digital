@@ -32,6 +32,6 @@
     .dark {
         --color-accent: var(--color-orange-400);
         --color-accent-content: var(--color-orange-400);
-        --color-accent-foreground: var(--color-orange-950);
+        --color-accent-foreground: var(--color-orange-700);
     }
 }
